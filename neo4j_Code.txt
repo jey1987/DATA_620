@@ -4,7 +4,7 @@ match (n) detach delete n
 
 //Load CSV file from GitHub and create relationship between Bitcoin Customers
 
-LOAD CSV FROM "file:///soc-sign-bitcoinotc_2.csv" AS line
+LOAD CSV FROM "https://raw.githubusercontent.com/jey1987/DATA_620/master/soc-sign-bitcoinotc_2.csv" AS line
 MERGE (src:Customer {name: line[0]})
 MERGE (tgt:Customer {name: line[1]})
 MERGE (src)-[r:RATES]->(tgt)
