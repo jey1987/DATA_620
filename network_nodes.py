@@ -1,5 +1,4 @@
 import networkx as nx
-G.clear
 G = nx.Graph()
 G.add_node("Charlotte")
 G.add_node("Winston Salem")
