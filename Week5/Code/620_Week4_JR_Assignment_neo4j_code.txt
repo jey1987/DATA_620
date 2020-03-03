@@ -1,0 +1,75 @@
+//Delete any existing nodes
+
+match (n) detach delete n
+
+//Load CSV file from GitHub and create relationship between Bitcoin Customers
+
+LOAD CSV FROM "https://raw.githubusercontent.com/jey1987/DATA607/master/Project3/Listings_Final.csv" AS line
+MERGE (src:Title {name: line[1]})
+MERGE (tgt:Location {name: line[3]})
+MERGE (src)-[r:HAS_POSN]->(tgt)
+ON CREATE SET r.rating = toInt(line[4])
+
+//Relationships between Customers 
+
+MATCH p=(:Location)-[:HAS_POSN]-(:Title)
+RETURN p
+
+//Number of Locations
+
+MATCH (c:Location) RETURN count(c)
+
+//Degree of the Relationships 
+
+MATCH (c:Location)
+RETURN c.name AS Location, size( (c)-[:HAS_POSN]-() ) AS degree ORDER BY degree DESC LIMIT 10
+
+MATCH (c:Location)
+RETURN c.name AS Location, size( (c)-[:HAS_POSN]-() ) AS degree ORDER BY degree ASC LIMIT 10
+
+CALL algo.eigenvector.stream('Location', 'HAS_POSN', {})
+YIELD nodeId, score
+
+# Degree of Relationship across multiple nodes 
+
+CALL algo.degree.stream(NULL, "HAS_POSN", {direction: "both"})
+YIELD nodeId, score
+RETURN algo.asNode(nodeId).id AS name, score AS followers
+ORDER BY followers DESC
+
+//Delete any existing nodes
+
+match (n) detach delete n
+
+//Load CSV file from GitHub and create relationship between Bitcoin Customers
+
+LOAD CSV FROM "https://raw.githubusercontent.com/jey1987/DATA607/master/Project3/Listings_Final.csv" AS line
+MERGE (src:Title {name: line[1]})
+MERGE (tgt:Company {name: line[2]})
+MERGE (src)-[r:CREATES]->(tgt)
+ON CREATE SET r.rating = toInt(line[4])
+
+//Relationships between Customers 
+
+MATCH p=(:Company)-[:CREATES]-(:Title)
+RETURN p
+
+//Number of Locations
+
+MATCH (c:Company) RETURN count(c)
+
+//Degree of the Relationships 
+
+MATCH (c:Company)
+RETURN c.name AS Location, size( (c)-[:CREATES]-() ) AS degree ORDER BY degree DESC LIMIT 10
+
+MATCH (c:Company)
+RETURN c.name AS Location, size( (c)-[:CREATES]-() ) AS degree ORDER BY degree ASC LIMIT 10
+
+CALL algo.eigenvector.stream('Company', 'CREATES', {})
+YIELD nodeId, score
+
+CALL algo.degree.stream(NULL, "CREATES", {direction: "both"})
+YIELD nodeId, score
+RETURN algo.asNode(nodeId).id AS name, score AS followers
+ORDER BY followers DESC
